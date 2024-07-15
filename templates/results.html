@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Game Results</h1>
+    <ul>
+        {% for player_id, score in scores.items() %}
+            <li>Player {{ player_id }}: {{ score }} points</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('index') }}">Play Again</a>
+{% endblock %}

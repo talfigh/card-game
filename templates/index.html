@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4 Player Card Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>4 Player Card Game</h1>
+    <div id="game-area">
+        <div id="player-hand" class="player">
+            <h2>Your Hand</h2>
+            <div class="hand" id="hand">Connecting...</div>
+            <button onclick="drawCard()" style="display:none;">Draw Card</button>
+        </div>
+    </div>
+    <h2>Remaining Cards in the Middle</h2>
+    <div id="deck"></div>
+    <div id="bidding-area" style="display:none;">
+        <h2>Bidding</h2>
+        <input type="number" id="bid-input" min="100" step="5">
+        <button onclick="placeBid()">Place Bid</button>
+        <button onclick="passBid()">Pass</button>
+    </div>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const playerId = "{{ player_id }}";
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
