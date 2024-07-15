@@ -46,14 +46,12 @@
   const sendMessage = () => {
     const message = document.getElementById("message");
     if (message.value == "") return;
-    socketio.emit("message", {data: message.value});
+    socketio.emit("message", { data: message.value });
     message.value = "";
   };
 </script>
 {%for msg in messages%}
-    <script>
-        createMessage("{{msg.name}}", "{{msg.message}}");
-    </script>
-{%endfor%}
-
-{% endblock %}
+<script>
+  createMessage("{{msg.name}}", "{{msg.message}}");
+</script>
+{%endfor%} {% endblock %}
