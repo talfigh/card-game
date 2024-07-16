@@ -13,20 +13,16 @@ values = ["Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", 
 rooms = {}
 usids = {}
 
+
 def createDeck():
     global deck
     deck = [{"suit": suit, "value": value} for suit in suits for value in values]
+
 
 def shuffleDeck():
     global deck
     random.shuffle(deck)
 
-def dealCards(room):
-    createDeck()
-    shuffleDeck()
-    global rooms
-    for player_name in rooms[room].keys():
-        rooms[room][player_name] = [deck.pop() for _ in range(12)]
 
 def generate_unique_code(length):
     while True:
@@ -57,6 +53,11 @@ def home():
                 "home.html", error="Please enter a room code", code=code, name=name
             )
 
+        if join != False and code in rooms and len(rooms[code].keys()) >= 4:
+            return render_template(
+                "home.html", error="Room is full", code=code, name=name
+            )
+
         room = code
         if create != False:
             room = generate_unique_code(4)
@@ -72,7 +73,7 @@ def home():
         session["room"] = room
         session["name"] = name
 
-        return redirect(url_for("room",player_id=name))
+        return redirect(url_for("room", player_id=name))
 
     return render_template("home.html")
 
@@ -104,6 +105,7 @@ def connect(auth):
     room = session.get("room")
     name = session.get("name")
     usids[room][name] = request.sid
+
     if not room or not name:
         print("no room or name")
         return
@@ -115,21 +117,28 @@ def connect(auth):
         print("room full")
         leave_room(room)
         return
-    join_room(room)
-    print(f"num {len(rooms[room].keys())}")
-    send({"name": name, "message": "joined the room"}, to=room)
-    rooms[room][name] = []
-    print(f"{name} joined room {room}")
-
-    if len(rooms[room].keys()) == 4:
-        print("dealing cards")
+    if len(rooms[room].keys()) == 0:
+        print("creating deck")
         createDeck()
         shuffleDeck()
-        dealCards(room)
-        for player_name in rooms[room].keys():
-            send({"name": player_name, "message": str(rooms[room][player_name])}, to=usids[room][player_name])
-            print(usids[room][player_name],"\n")
-            print(f"{player_name} has been dealt {rooms[room][player_name]}")
+    join_room(room)
+    print(f"num {len(rooms[room].keys())}")
+    # send({"name": name, "message": "joined the room"}, to=room)
+    rooms[room][name] = []
+    print(f"{name} joined room {room}")
+    global deck
+    # Check if the deck has enough cards
+    print("sssssssss",deck)
+    if len(deck) >= 12:
+        rooms[room][name] = [deck.pop() for _ in range(12)]
+    else:
+        print("Not enough cards in the deck to deal")
+    send(
+        {"name": name, "message": rooms[room][name]},
+        to=usids[room][name],
+    )
+    print(usids[room][name], "\n")
+    print(f"{name} has been dealt {(rooms[room][name])}")
 
 
 @socketio.on("disconnect")
@@ -144,6 +153,7 @@ def disconnect():
             del rooms[room]
 
     send({"name": name, "message": "left the room"}, to=room)
+
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
