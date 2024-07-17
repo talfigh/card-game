@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} 
+{% block content %}
 <div class="message-box">
   <h2>Game Room: {{code}}</h2>
   <div class="messages" id="messages"></div>
@@ -21,15 +22,16 @@
   const messages = document.getElementById("messages");
 
   const createMessage = (name, msg) => {
-    let content = `<h1>${name}</h1><ul>`;
+    let content = `<h1>Players name: ${name}</h1><div class="card-container">`;
     let message = msg;
     if (typeof msg === "string") {
       message = JSON.parse(msg);
     }
     message.forEach((card) => {
-      content += `<li>Suit: ${card.suit}, Value: ${card.value}</li>`;
+      const cardImage = `<img src="/static/cards/${card.value.toLowerCase()}_of_${card.suit.toLowerCase()}.png" alt="${card.suit} ${card.value}" class="card-image" />`;
+      content += cardImage;
     });
-    content += "</ul>";
+    content += "</div>";
     messages.innerHTML += content;
   };
 
